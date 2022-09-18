@@ -3,13 +3,15 @@
 use strict;
 use warnings;
 use experimental 'for_list';
+use builtin      'indexed';
+no  warnings     'experimental::builtin';
 
 use Test::More;
 
 sub find_index {
 	my $string = shift;
 	
-	for my ( $index, $char ) ( [ split //, $string ]->%[ 0 .. length($string) - 1 ] ) {
+	for my ( $index, $char ) ( indexed split //, $string ) {
 		return ( $index, $char )
 			if index( $string, $char ) == rindex( $string, $char );
 	}
