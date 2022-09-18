@@ -2,26 +2,16 @@
 
 use strict;
 use warnings;
-use feature qw(say);
 
 use Test::More;
 
-my %paths;
+my $deepest_path = do {
+	local $/;
+	$+{c} if <DATA> =~ m|^ (?<c> (?: /[^\n/]+ )+ ) (?&c) (?: \n\g{c} (?&c) )+ $|x;
+};
 
-while ( my $path = <DATA> ) {
-    my $i = 1;
-    $i++, $paths{$1}++ while $path =~ m| ( ( /[^/]* ){ $i } ) (?-1){2} |x;
-}
 
-is(
-    (
-        sort    { $b->[1] <=> $a->[1] || length $b->[0] cmp length $a->[0] }
-            map { [ $_, $paths{$_} ] }
-            keys %paths
-    )[0]->[0],
-    "/a/b/c",
-	"is it the deepest path to the directory that contain all `x.pl's?"
-);
+is( $deepest_path, '/a/b/c', "is '$deepest_path' the deepest path?" );
 
 done_testing( 1 );
 
