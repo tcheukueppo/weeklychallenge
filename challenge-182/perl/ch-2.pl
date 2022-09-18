@@ -6,10 +6,9 @@ use warnings;
 use Test::More;
 
 my $deepest_path = do {
-	local $/;
-	$+{c} if <DATA> =~ m|^ (?<c> (?: /[^\n/]+ )+ ) (?&c) (?: \n\g{c} (?&c) )+ $|x;
+    local $/;
+    $+{c} if <DATA> =~ m|^ (?<c> (?: /[^\n/]+ )+ ) (?&c) (?: \n\g{c} (?&c) )+ $|x;
 };
-
 
 is( $deepest_path, '/a/b/c', "is '$deepest_path' the deepest path?" );
 
