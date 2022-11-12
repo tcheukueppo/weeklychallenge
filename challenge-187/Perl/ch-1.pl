@@ -3,15 +3,14 @@
 use strict;
 use warnings;
 
-use Data::Dumper;
 use DateTime;
 use List::Util qw( min max );
-use feature    qw(say state);
+use feature    qw(say);
 
 use Test::More;
 
 # Boils down to a simple calculation of the intersection between two
-# intervals [x,y] and [n,m] which is [min(x,n), min(y,m)].
+# intervals [x,y] and [n,m] which is [max(x,n), min(y,m)].
 
 sub intersections {
     my $result;
@@ -32,18 +31,14 @@ sub intersections {
     # Find domain of intersection between the two intervals
     foreach my $interval ( @$intervals ) {
         my ( $fstart, $fend, $bstart, $bend ) = map { cal_ndays( $_ ) } map { @$_ } $interval->@{qw/Foo Bar/};
-        my $ndays = min( $fend, $bend ) - max( $fstart, $bstart );
-
-        say $ndays;
-
-        push @$result, $ndays;
+        push @$result, min( $fend, $bend ) - max( $fstart, $bstart ) + 1;
     }
+
+    return $result;
 }
 
 my $expected = [ qw(4 0 2 4) ];
 
-intersections();
+is_deeply( intersections(), $expected, 'Are the intersections correct?' );
 
-#is_deeply( intersections( ), $expected, 'Are the intersections correct?' );
-
-#done_testing( 1 );
+done_testing( 1 );
