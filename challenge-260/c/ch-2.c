@@ -3,32 +3,46 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define plan(n)         assert(n > 0); unsigned int ___t = 0, ___nt = n
+#define done_testing()  (assert(___t == ___nt))
+
+#define is(t, e, h)  ___t++;                                         \
+                     (t == e)                                         \
+                       ? fprintf(stderr, "%d ok - %s\n", ___t, h)      \
+                       : fprintf(stdout, "%d not ok - %s\n", ___t, h)
+
+
 unsigned int fac(unsigned int n);
-char **      alloc_perms(char **perms, unsigned int prev_len, unsigned int len);
-void         alloc_error(int l);
-void         gen_perms(char **perms, char *str, unsigned int start, unsigned int len);
-void         sort_perms(char **perms, unsigned int perm_len);
+char **alloc_perms(char **perms, unsigned int prev_len, unsigned int len);
+void alloc_error(int l);
+void gen_perms(char **perms, char *str, unsigned int start, unsigned int len);
+void sort_perms(char **perms, unsigned int perm_len);
 unsigned int dict_rank(char *str, char **perms, unsigned int perm_len);
 
 int
 main(void)
 {
-   int i, data_len = 3, prev_len = 0;
-
-   struct { char *str; unsigned int len; } data[] = {
-      { "CAT",    3 },
-      { "GOOGLE", 6 },
-      { "SECRET", 6 },
-   };
+   plan(3);
 
    char **perms = NULL;
+   int i, data_len = 3, prev_len = 0;
+
+   struct {
+      char *str;
+      unsigned int len;
+      unsigned int e;
+   } data[] = {
+      { "CAT",    3, 3   },
+      { "GOOGLE", 6, 88  },
+      { "SECRET", 6, 255 },
+   };
 
    for (i = 0; i < data_len; i++) {
       int j;
       unsigned int perm_len = fac(data[i].len);
 
       for (j = 0; j < prev_len; j++)
-         if (*perms[i] != '\0')
+         if (*perms[j] != '\0')
             free(perms[j]);
 
       if (!perms || prev_len < perm_len)
@@ -37,14 +51,17 @@ main(void)
       gen_perms(perms, data[i].str, 0, data[i].len - 1);
       sort_perms(perms, perm_len);
 
-      fprintf(stdout, "dict rank('%s') = %u\n", data[i].str, dict_rank(data[i].str, perms, perm_len));
+      is(dict_rank(data[i].str, perms, perm_len), data[i].e, "Valid rank?");
+
       prev_len = perm_len;
    }
    
    for (i = 0; i < prev_len; i++)
-      if (!(*perms[i] == '\0'))
+      if (*perms[i] != '\0')
          free(perms[i]);
    free(perms);
+
+   done_testing();
 
    return 0;
 }
@@ -110,8 +127,10 @@ gen_perms(char **perms, char *str, unsigned int start, unsigned int len)
 
          gen_perms(perms, dstr, start + 1, len);
          
-         dstr[i] = dstr[start];
-         dstr[start] = tmp;
+         if (p != perm_len) {
+            dstr[i] = dstr[start];
+            dstr[start] = tmp;
+         }
       }
    }
 

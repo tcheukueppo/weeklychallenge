@@ -8,7 +8,7 @@
 
 #define is(t, e, h)  ___t++;                                         \
                      (t == e)                                         \
-                       ? fprintf(stderr, "%d ok - %s\n", ___t, h)  \
+                       ? fprintf(stderr, "%d ok - %s\n", ___t, h)      \
                        : fprintf(stdout, "%d not ok - %s\n", ___t, h)
 
 typedef struct N {
@@ -38,6 +38,7 @@ main(void)
 
    free(n);
    done_testing();
+   return 0;
 }
 
 bool
